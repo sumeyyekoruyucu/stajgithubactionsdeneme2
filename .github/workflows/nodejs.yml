@@ -1,0 +1,42 @@
+name: Node.js Project Deployment
+
+on:
+  repository_dispatch:
+    types: [trigger_workflow_nodejs]
+
+jobs:
+  deploy-node:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '16'
+
+    - name: Print Local Time
+      run: |
+        local_time=$(date +'%Y-%m-%d %H:%M:%S %Z')
+        echo "Local Time: $local_time"
+
+    - name: Install PM2
+      run: npm install -g pm2
+
+    - name: Install Dependencies
+      run: |
+        cd my-node-app
+        npm install
+
+    - name: Start Application
+      run: |
+        cd my-node-app
+        pm2 start app.js
+        pm2 save
+
+    - name: Verify Deployment
+      run: |
+        cd my-node-app
+        pm2 list
